@@ -6,13 +6,13 @@ import sys
 HOST = ''              # Endereco IP do Servidor
 PORT = 5000           # Porta que o Servidor esta
 
-film_list = ['filme1','filme2']
-film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002'}]} 
-keys = ['init', 'end', 'host', 'port']
+film_list = ['nanana','nonono']
+film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002'}]}
+keys = ['init', 'end', 'host', 'port', 'path']
 
 def save(info, cliente):
-    film_name = info[0] 
-    
+    film_name = info[0]
+
     if str(film_name) in film_info:
         info.remove(info[0])
         dict_info = dict(zip(keys, info))
@@ -26,8 +26,9 @@ def browse_movies(con,cliente):
         response = con.recv(1024).decode('utf-8')
         print(response)
         if film_list[int(response)]:
-            con.sendall(film_info[int(response)].encode('utf-8'))
+            film_name = film_list[int(response)]
             con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
+            con.sendall(str(film_info[film_name]).encode('utf-8'))
             break
         else:
             con.sendall(("Opcao invalida").encode('utf-8'))
@@ -42,7 +43,7 @@ def send_film(con, cliente):
     print(response)
     response = response.split("|")
     print(response)
-    save(response, cliente)     
+    save(response, cliente)
 # except:
     # print("Unexpected error:", sys.exc_info()[0])
 
@@ -52,7 +53,7 @@ def conectado(con, cliente):
 
     while True:
     # try:
-        directive = "Envie 1 para consultar os filmes do menu ou 2 para enviar um filme para o menu" 
+        directive = "Envie 1 para consultar os filmes do menu ou 2 para enviar um filme para o menu"
         con.sendall(directive.encode('utf-8'))
         response = con.recv(1024).decode('utf-8')
         print(response)
@@ -85,6 +86,6 @@ def main():
         con, cliente = tcp.accept()
         _thread.start_new_thread(conectado, tuple([con, cliente]))
 
-    tcp.close()    
+    tcp.close()
 
 main()
