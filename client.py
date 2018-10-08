@@ -25,6 +25,15 @@ def open_connection(port):
 
 def connect_client(infos):
 	print(infos)
+	infos_dict = info[0]
+	cHOST = infos_dict['host']
+	cPORT = infos_dict['port']
+	tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	dest = (cHOST, cPORT)
+	tcp.connect(dest)
+
+
+
 
 def main():
 	print("Deseja abrir a conexão com outros clientes? (sim)")
@@ -44,6 +53,7 @@ def main():
 		print(recv)
 		msg = input()
 		if msg == "CLI":
+			print 
 			connect_client(recv)
 			break
 		elif msg == '\x18':

@@ -27,14 +27,14 @@ def browse_movies(con,cliente):
         print(response)
         if film_list[int(response)]:
             film_name = film_list[int(response)]
-            con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
+            con.sendall(("Para se conectar com o cliente aperte ENTER e envie 'CLI'").encode('utf-8'))
             con.sendall(str(film_info[film_name]).encode('utf-8'))
             break
         else:
             con.sendall(("Opcao invalida").encode('utf-8'))
             continue
     # except:
-        # print("Unexpected error:", sys.exc_info()[0])
+    # print("Unexpected error:", sys.exc_info()[0])
 
 def send_film(con, cliente):
 # try:
