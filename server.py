@@ -2,12 +2,13 @@ import socket
 import _thread
 import re
 import sys
+import time
 
 HOST = ''              # Endereco IP do Servidor
 PORT = 5000           # Porta que o Servidor esta
 
 film_list = ['nanana','nonono']
-film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002'}]}
+film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
 keys = ['init', 'end', 'host', 'port', 'path']
 
 def save(info, cliente):
@@ -27,8 +28,9 @@ def browse_movies(con,cliente):
         print(response)
         if film_list[int(response)]:
             film_name = film_list[int(response)]
-            con.sendall(("Para se conectar com o cliente aperte ENTER e envie 'CLI'").encode('utf-8'))
-            con.sendall(str(film_info[film_name]).encode('utf-8'))
+            con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
+            if con.recv(1024).decode('utf-8') == 'CLI':
+                con.sendall(str(film_info[film_name]).encode('utf-8'))
             break
         else:
             con.sendall(("Opcao invalida").encode('utf-8'))
@@ -37,15 +39,12 @@ def browse_movies(con,cliente):
     # print("Unexpected error:", sys.exc_info()[0])
 
 def send_film(con, cliente):
-# try:
     con.sendall(("Envie a informaçao do filme seguindo o padrão: \n nome do filme | %/ inicio | %/ fim | host | porta").encode('utf-8'))
     response = con.recv(1024).decode('utf-8')
     print(response)
     response = response.split("|")
     print(response)
     save(response, cliente)
-# except:
-    # print("Unexpected error:", sys.exc_info()[0])
 
 
 def conectado(con, cliente):
@@ -68,17 +67,14 @@ def conectado(con, cliente):
             continue
     # except:
         # print("Unexpected error:", sys.exc_info()[0])
-
-        # elif re.findall(r'^\d$', msg.decode('utf-8')):
     print ('Finalizando conexao do cliente', cliente)
     con.close()
     _thread.exit()
 
 def main():
+    #Server baseado em:  https://wiki.python.org.br/SocketBasico
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     orig = (HOST, PORT)
-
     tcp.bind(orig)
     tcp.listen(1)
 
