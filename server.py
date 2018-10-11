@@ -10,7 +10,7 @@ PORT = 5000           # Porta que o Servidor esta
 film_list = ['nanana','nonono']
 film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
 keys = ['init', 'end', 'host', 'port', 'path']
-
+# init: byte de inicio do arquivo(Se é que isso da certo), end: byte de fim
 def save(info, cliente):
     film_name = info[0]
 
