@@ -4,11 +4,12 @@ import re
 import sys
 import time
 
-HOST = ''              # Endereco IP do Servidor
-PORT = 5000           # Porta que o Servidor esta
+HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
+PORT = 5000                                       # Porta que o Servidor está rodando
 
-film_list = ['nanana','nonono']
-film_info = {'nanana': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],'nonono': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
+film_list = ['Indiana Jones','Blade Runner']
+film_info = {'Indiana Jones': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],
+             'Blade Runner': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
 keys = ['init', 'end', 'host', 'port', 'path']
 # init: byte de inicio do arquivo(Se é que isso da certo), end: byte de fim
 def save(info, cliente):
@@ -23,7 +24,7 @@ def browse_movies(con,cliente):
     while True:
         # try:
         for i, film in enumerate(film_list):
-            con.sendall((str(film)+": Envie "+str(i)).encode('utf-8'))
+            con.sendall((str(film)+": Envie "+str(i)+"\n").encode('utf-8'))
         response = con.recv(1024).decode('utf-8')
         print(response)
         if film_list[int(response)]:
@@ -33,13 +34,13 @@ def browse_movies(con,cliente):
                 con.sendall(str(film_info[film_name]).encode('utf-8'))
             break
         else:
-            con.sendall(("Opcao invalida").encode('utf-8'))
+            con.sendall(("Opção inválida").encode('utf-8'))
             continue
     # except:
     # print("Unexpected error:", sys.exc_info()[0])
 
-def send_film(con, cliente):
-    con.sendall(("Envie a informaçao do filme seguindo o padrão: \n nome do filme | %/ inicio | %/ fim | host | porta").encode('utf-8'))
+def send_movie(con, cliente):
+    con.sendall(("Envie a informação do filme seguindo o padrão: \n nome do filme | %/ inicio | %/ fim | host | porta").encode('utf-8'))
     response = con.recv(1024).decode('utf-8')
     print(response)
     response = response.split("|")
@@ -60,10 +61,10 @@ def conectado(con, cliente):
             browse_movies(con,cliente)
             break
         elif response =="2":
-            send_film(con,cliente)
+            send_movie(con,cliente)
             break
         else:
-            con.sendall(("Opcao invalida").encode('utf-8'))
+            con.sendall(("Opção invalida").encode('utf-8'))
             continue
     # except:
         # print("Unexpected error:", sys.exc_info()[0])

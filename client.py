@@ -3,9 +3,8 @@ import sys
 import _thread
 import ast
 
-HOST = '127.0.0.1'     # Endereco IP do Servidor
-PORT = 5000          # Porta que o Servidor esta
-
+HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Cliente
+PORT = 5000                                       # Porta que o Cliente está rodando
 
 # class Peer:  Colocar send file e open connection numa classe Peer diferente de client.
 
@@ -22,8 +21,8 @@ def send_file(con,cliente):
 		fr = f.read(1024)
 	f.close()
 
-	print('Done sending')
-	con.send(('Thank you for connecting').encode('utf-8'))
+	print('Envio feito!')
+	con.send(('Obrigado por conectar!').encode('utf-8'))
 	con.close()
 
 
@@ -46,9 +45,9 @@ def open_connection(port):
 def receive_file(tcp):
 	#Parte da funcao retirada de: https://gist.github.com/giefko/2fa22e01ff98e72a5be2
 	with open('received_file', 'wb') as f:
-		print('file opened')
+		print('Arquivo aberto')
 		while True:
-			print('receiving data...')
+			print('Downloading...')
 			data = tcp.recv(1024)
 			print('data=%s', (data))
 			if not data:
@@ -57,9 +56,9 @@ def receive_file(tcp):
 			f.write(data)
 
 	f.close()
-	print('Successfully get the file')
+	print('Arquivo baixado com sucesso.')
 	tcp.close()
-	print('connection closed')
+	print('Conexão encerrada.')
 
 
 def connect_peer(infos):
