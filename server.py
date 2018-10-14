@@ -31,12 +31,7 @@ def get_movies():
 
 def insert_movie(movie):
     table.put_item(
-        Item={
-            'titulo' : movie['titulo'],
-            'clients': [
-                {'init': movie['init'], 'end': movie['end'],'host': movie['host'], 'port': movie['port'], 'path': movie['path']}
-            ]
-        }
+        Item=movie
     )
 
 def browse_movies(con,cliente):
