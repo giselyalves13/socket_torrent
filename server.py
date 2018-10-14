@@ -29,7 +29,7 @@ def get_movies():
     response = client.scan(TableName='filmes')
     return response
 
-def insert_movie(movie) {
+def insert_movie(movie):
     table.put_item(
         Item={
             'titulo' : movie['titulo'],
@@ -37,8 +37,7 @@ def insert_movie(movie) {
                 {'init': movie['init'], 'end': movie['end'],'host': movie['host'], 'port': movie['port'], 'path': movie['path']}
             ]
         }
-        )
-}
+    )
 
 def browse_movies(con,cliente):
     while True:
