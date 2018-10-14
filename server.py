@@ -4,6 +4,7 @@ import re
 import sys
 import time
 import boto3
+import json
 
 dynamodb = boto3.resource('dynamodb', region_name='us-west-1')
 table = dynamodb.Table('filmes')
@@ -93,12 +94,12 @@ def main():
     tcp.bind(orig)
     tcp.listen(1)
     # print(get_movies())
-    movie = {
+    movie = json.dumps({
         'titulo' : 'Indiana Jones',
         'clients': [
             {'init': 20, 'end': 60,'host': '', 'port': 5001, 'path': 'caminho.mp4'}
         ]
-    }
+    })
     insert_movie(movie)
 
     while True:
