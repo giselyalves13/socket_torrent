@@ -97,7 +97,14 @@ def main():
     orig = (HOST, PORT)
     tcp.bind(orig)
     tcp.listen(1)
-    print(get_movies())
+    # print(get_movies())
+    movie = {
+        'titulo' : 'Indiana Jones',
+        'clients': [
+            {'init': 20, 'end': 60,'host': '', 'port': 5001, 'path': 'caminho.mp4'}
+        ]
+    }
+    insert_movie(movie)
 
     while True:
         con, cliente = tcp.accept()
