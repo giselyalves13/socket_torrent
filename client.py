@@ -3,8 +3,8 @@ import sys
 import _thread
 import ast
 
-HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Cliente
-PORT = 5000                                       # Porta que o Cliente está rodando
+HOST = "18.234.116.182" # Endereco IP do Servidor a se conectar
+PORT = 5000          # Porta que do servidor
 
 # class Peer:  Colocar send file e open connection numa classe Peer diferente de client.
 

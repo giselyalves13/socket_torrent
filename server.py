@@ -3,6 +3,10 @@ import _thread
 import re
 import sys
 import time
+import boto3
+
+dynamodb = boto3.client('dynamodb')
+table = dynamodb.Table('filmes')
 
 HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
 PORT = 5000                                       # Porta que o Servidor está rodando
@@ -12,6 +16,7 @@ film_info = {'Indiana Jones': [{'init': '20', 'end': '60','host': '', 'port': '5
              'Blade Runner': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
 keys = ['init', 'end', 'host', 'port', 'path']
 # init: byte de inicio do arquivo(Se é que isso da certo), end: byte de fim
+
 def save(info, cliente):
     film_name = info[0]
 
@@ -19,6 +24,21 @@ def save(info, cliente):
         info.remove(info[0])
         dict_info = dict(zip(keys, info))
         film_info[str(film_name)].append(dict_info)
+
+def get_movies():
+    response = client.scan(TableName='filmes')
+    return response
+
+def insert_movie(movie) {
+    table.put_item(
+        Item={
+            'titulo' : movie['titulo'],
+            'clients': [
+                {'init': movie['init'], 'end': movie['end'],'host': movie['host'], 'port': movie['port'], 'path': movie['path']}
+            ]
+        }
+        )
+}
 
 def browse_movies(con,cliente):
     while True:
@@ -78,6 +98,7 @@ def main():
     orig = (HOST, PORT)
     tcp.bind(orig)
     tcp.listen(1)
+    print(get_movies())
 
     while True:
         con, cliente = tcp.accept()
