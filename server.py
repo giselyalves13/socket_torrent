@@ -31,7 +31,7 @@ def get_movies():
 
 def insert_movie(movie):
     table.put_item(
-        Item=movie
+        Item={movie}
     )
 
 def browse_movies(con,cliente):
