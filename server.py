@@ -74,6 +74,8 @@ def conectado(con, cliente):
 
 def main():
     #Server baseado em:  https://wiki.python.org.br/SocketBasico
+    print('Servidor inicializado.')
+    print('Aguardando conexão de clientes...')
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     orig = (HOST, PORT)
     tcp.bind(orig)

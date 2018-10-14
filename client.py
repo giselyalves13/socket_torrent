@@ -76,7 +76,6 @@ def connect_peer(infos):
 	tcp.connect(dest)
 	tcp.send((infos_dict['path']).encode('utf-8'))
 	receive_file(tcp)
-	print('sei la')
 
 def main():
 	print("Deseja abrir a conexão com outros clientes? (sim)")
