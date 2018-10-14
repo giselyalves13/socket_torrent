@@ -5,7 +5,7 @@ import sys
 import time
 import boto3
 
-dynamodb = boto3.client('dynamodb', region_name='us-west-1')
+dynamodb = boto3.resource('dynamodb', region_name='us-west-1')
 table = dynamodb.Table('filmes')
 
 HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
