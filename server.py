@@ -26,7 +26,7 @@ def save(info, cliente):
         film_info[str(film_name)].append(dict_info)
 
 def get_movies():
-    response = dynamodb.scan(TableName='filmes')
+    response = table.scan()
     return response
 
 def insert_movie(movie):
