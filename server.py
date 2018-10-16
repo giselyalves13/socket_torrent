@@ -3,44 +3,64 @@ import _thread
 import re
 import sys
 import time
+import pickle
 
 HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
 PORT = 5000                                       # Porta que o Servidor está rodando
 
-film_list = ['Indiana Jones','Blade Runner']
-film_info = {'Indiana Jones': [{'init': '20', 'end': '60','host': '', 'port': '5001', 'path': 'caminho.mp4'}],
-             'Blade Runner': [{'init': '20', 'end': '60', 'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
-keys = ['init', 'end', 'host', 'port', 'path']
+film_info = {'Indiana Jones': [{'host': '', 'port': '5001', 'path': 'caminho.mp4'}],
+             'Blade Runner': [{'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
+keys = ['host', 'port', 'path']
 # init: byte de inicio do arquivo(Se é que isso da certo), end: byte de fim
+
+def load_file():
+    try:
+        with open('film_db.pkl', 'rb') as f:
+            global film_info
+            film_info = pickle.load(f)
+    except:
+        print("Problema ao abrir o arquivo de filmes: ", sys.exc_info())
+
 def save(info, cliente):
     film_name = info[0]
 
-    if str(film_name) in film_info:
-        info.remove(info[0])
-        dict_info = dict(zip(keys, info))
-        film_info[str(film_name)].append(dict_info)
+    try:
+        if str(film_name) in film_info:
+            info.remove(info[0])
+            dict_info = dict(zip(keys, info))
+            film_info[str(film_name)].append(dict_info)
+        else:
+            info.remove(info[0])
+            dict_info = dict(zip(keys, info))
+            film_info[film_name] = dict_info
+        with open('film_db.pkl', 'wb+') as f:
+            pickle.dump(film_info, f, pickle.HIGHEST_PROTOCOL)
+    except:
+        print(sys.exc_info())
 
 def browse_movies(con,cliente):
-    while True:
-        try:
-            for i, film in enumerate(film_list):
-                con.sendall((str(film)+": Envie "+str(i)+"\n").encode('utf-8'))
-            response = con.recv(1024).decode('utf-8')
+    load_file()
+    try:
+        while True:
+            data = ''
+            for i, film in enumerate(film_info.keys()):
+                data = data + "\n " + str(film) +": Envie "+str(i)
+            con.sendall(data.encode('utf-8'))
+            response = int(con.recv(1024).decode('utf-8'))
             print(response)
-            if film_list[int(response)]:
-                film_name = film_list[int(response)]
+            if response < len(film_info) and response >= 0:
                 con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
                 if con.recv(1024).decode('utf-8') == 'CLI':
-                    con.sendall(str(film_info[film_name]).encode('utf-8'))
+                    con.sendall(str(film_info.values()[response]).encode('utf-8'))
                 break
             else:
                 con.sendall(("Opção inválida").encode('utf-8'))
                 continue
-        except:
-            print("Erro ao buscar filmes:", sys.exc_info()[0])
+    except:
+        print("Erro ao buscar filmes:", sys.exc_info())
 
 def send_movie(con, cliente):
-    con.sendall(("Envie a informação do filme seguindo o padrão: \n nome do filme | %/ inicio | %/ fim | host | porta").encode('utf-8'))
+    con.sendall(("Envie a informação do filme seguindo o padrão: \n nome do filme | host | porta | caminho").encode('utf-8'))
     response = con.recv(1024).decode('utf-8')
     print(response)
     response = response.split("|")
@@ -80,13 +100,10 @@ def main():
     orig = (HOST, PORT)
     tcp.bind(orig)
     tcp.listen(1)
-
+    load_file()
     while True:
-        try:
             con, cliente = tcp.accept()
             _thread.start_new_thread(conectado, tuple([con, cliente]))
-        except:
-            print("Erro ao se conectar com cliente: ", sys.exc_info()[0])
     tcp.close()
 
 main()

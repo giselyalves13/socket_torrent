@@ -21,14 +21,13 @@ def send_file(con,cliente):
 			fr = f.read(1024)
 		f.close()
 		print('Envio feito!')
-		con.send(('Obrigado por conectar!').encode('utf-8'))
 	except:
 		print("Erro ao enviar arquivo: ", sys.exc_info()[0])
 	con.close()
 
 
-def open_connection(port):
-	myHOST = '127.0.0.1'
+def open_connection(host, port):
+	myHOST = host
 	myPORT = int(port)
 	tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	orig = (myHOST, myPORT)
@@ -73,10 +72,7 @@ def connect_peer(infos):
 	infos_dict = ast.literal_eval(infos[1:-1])
 	print(infos_dict.values())
 
-	for i in infos_dict:
-		print(i)
-	print('oi: ', infos_dict['port'])
-	cHOST = ''
+	cHOST = infos_dict['host']
 	cPORT = int(infos_dict['port'])
 	tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	dest = (cHOST, cPORT)
@@ -85,7 +81,7 @@ def connect_peer(infos):
 		tcp.send((infos_dict['path']).encode('utf-8'))
 		receive_file(tcp)
 	except:
-		print("Erro ao conectar com cliente: ", sys.exc_info()[0])
+		print("Erro ao conectar com cliente: ", sys.exc_info())
 
 def main():
 	print("Deseja abrir a conexão com outros clientes? (sim)")
@@ -93,27 +89,26 @@ def main():
 	if res == 'sim':
 		print("Informe a porta: ")
 		port = input()
-		_thread.start_new_thread(open_connection, tuple([port]))
+		# print("Informe o host: ")
+		host = ''
+		_thread.start_new_thread(open_connection, tuple([host, port]))
 
 	tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	dest = (HOST, PORT)
-	try:
-		tcp.connect(dest)
-		print ('Para sair use CTRL+X\n')
-		while True :
-			recv = tcp.recv(1024).decode('utf-8')
-			print(recv)
-			msg = input()
-			if msg == "CLI":
-				tcp.send(msg.encode('utf-8'))
-				recv = tcp.recv(1024).decode('utf-8')
-				connect_peer(recv)
-				break
-			elif msg == '\x18':
-				break
+	tcp.connect(dest)
+	print ('Para sair use CTRL+X\n')
+	while True :
+		recv = tcp.recv(1024).decode('utf-8')
+		print(recv)
+		msg = input()
+		if msg == "CLI":
 			tcp.send(msg.encode('utf-8'))
-	except:
-		print("Erro na conexão: ", sys.exc_info()[0])
+			recv = tcp.recv(1024).decode('utf-8')
+			connect_peer(recv)
+			break
+		elif msg == '\x18':
+			break
+		tcp.send(msg.encode('utf-8'))
 	tcp.close()
 
 
