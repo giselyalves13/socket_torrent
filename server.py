@@ -5,13 +5,13 @@ import sys
 import time
 import pickle
 
-HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
+# HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Servidor
+HOST = ''
 PORT = 5000                                       # Porta que o Servidor está rodando
 
 film_info = {'Indiana Jones': [{'host': '', 'port': '5001', 'path': 'caminho.mp4'}],
              'Blade Runner': [{'host': '', 'port' : '5002', 'path': 'caminho.mp4'}]}
 keys = ['host', 'port', 'path']
-# init: byte de inicio do arquivo(Se é que isso da certo), end: byte de fim
 
 def load_file():
     try:
@@ -43,15 +43,16 @@ def browse_movies(con,cliente):
     try:
         while True:
             data = ''
+            print(film_info)
             for i, film in enumerate(film_info.keys()):
                 data = data + "\n " + str(film) +": Envie "+str(i)
             con.sendall(data.encode('utf-8'))
             response = int(con.recv(1024).decode('utf-8'))
-            print(response)
+            print(list(film_info.values()))
             if response < len(film_info) and response >= 0:
                 con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
                 if con.recv(1024).decode('utf-8') == 'CLI':
-                    con.sendall(str(film_info.values()[response]).encode('utf-8'))
+                    con.sendall(str(list(film_info.values())[response]).encode('utf-8'))
                 break
             else:
                 con.sendall(("Opção inválida").encode('utf-8'))
@@ -61,18 +62,21 @@ def browse_movies(con,cliente):
 
 def send_movie(con, cliente):
     con.sendall(("Envie a informação do filme seguindo o padrão: \n nome do filme | host | porta | caminho").encode('utf-8'))
-    response = con.recv(1024).decode('utf-8')
-    print(response)
-    response = response.split("|")
+    titulo = con.recv(1024).decode('utf-8')
+    con.sendall(("Informe o caminho do arquivo: ").encode('utf-8'))
+    caminho = con.recv(1024).decode('utf-8')
+    con.sendall(("Informe a porta: ").encode('utf-8'))
+    port = con.recv(1024).decode('utf-8')
+    host = cliente[0]
+    response = [titulo, host, port, caminho]
     print(response)
     save(response, cliente)
 
 
 def conectado(con, cliente):
     print ('Conectado por', cliente)
-
-    while True:
-        try:
+    try:
+        while True:
             directive = "Envie 1 para consultar os filmes do menu ou 2 para enviar um filme para o menu"
             con.sendall(directive.encode('utf-8'))
             response = con.recv(1024).decode('utf-8')
@@ -86,8 +90,8 @@ def conectado(con, cliente):
             else:
                 con.sendall(("Opção invalida").encode('utf-8'))
                 continue
-        except:
-            print("Erro com o servidor:", sys.exc_info()[0])
+    except:
+        print("Erro com o servidor:", sys.exc_info())
     print ('Finalizando conexao do cliente', cliente)
     con.close()
     _thread.exit()

@@ -3,8 +3,9 @@ import sys
 import _thread
 import ast
 
-HOST = socket.gethostbyname(socket.gethostname()) # Endereco IP do Cliente
-PORT = 5000                                       # Porta que o Cliente está rodando
+# sHOST = socket.gethostbyname(socket.gethostname())
+sHOST = '127.0.0.1' # Endereco IP do Cliente
+sPORT = 5000                                       # Porta que o Cliente está rodando
 
 
 def send_file(con,cliente):
@@ -48,7 +49,7 @@ def open_connection(host, port):
 def receive_file(tcp):
 	#Parte da funcao retirada de: https://gist.github.com/giefko/2fa22e01ff98e72a5be2
 	try:
-		with open('received_file', 'wb') as f:
+		with open('received_file.mp4', 'wb') as f:
 			print('Arquivo aberto')
 			while True:
 				print('Downloading...')
@@ -69,8 +70,8 @@ def receive_file(tcp):
 
 def connect_peer(infos):
 	print(infos)
-	infos_dict = ast.literal_eval(infos[1:-1])
-	print(infos_dict.values())
+	infos_dict = ast.literal_eval(infos)
+	print(infos_dict)
 
 	cHOST = infos_dict['host']
 	cPORT = int(infos_dict['port'])
@@ -82,6 +83,7 @@ def connect_peer(infos):
 		receive_file(tcp)
 	except:
 		print("Erro ao conectar com cliente: ", sys.exc_info())
+	tcp.close()
 
 def main():
 	print("Deseja abrir a conexão com outros clientes? (sim)")
@@ -89,12 +91,12 @@ def main():
 	if res == 'sim':
 		print("Informe a porta: ")
 		port = input()
-		# print("Informe o host: ")
-		host = ''
+		host = '127.0.0.1'
+		print(host)
 		_thread.start_new_thread(open_connection, tuple([host, port]))
 
 	tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	dest = (HOST, PORT)
+	dest = (sHOST, sPORT)
 	tcp.connect(dest)
 	print ('Para sair use CTRL+X\n')
 	while True :
@@ -104,6 +106,7 @@ def main():
 		if msg == "CLI":
 			tcp.send(msg.encode('utf-8'))
 			recv = tcp.recv(1024).decode('utf-8')
+			print(recv)
 			connect_peer(recv)
 			break
 		elif msg == '\x18':
