@@ -22,22 +22,22 @@ def save(info, cliente):
 
 def browse_movies(con,cliente):
     while True:
-        # try:
-        for i, film in enumerate(film_list):
-            con.sendall((str(film)+": Envie "+str(i)+"\n").encode('utf-8'))
-        response = con.recv(1024).decode('utf-8')
-        print(response)
-        if film_list[int(response)]:
-            film_name = film_list[int(response)]
-            con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
-            if con.recv(1024).decode('utf-8') == 'CLI':
-                con.sendall(str(film_info[film_name]).encode('utf-8'))
-            break
-        else:
-            con.sendall(("Opção inválida").encode('utf-8'))
-            continue
-    # except:
-    # print("Unexpected error:", sys.exc_info()[0])
+        try:
+            for i, film in enumerate(film_list):
+                con.sendall((str(film)+": Envie "+str(i)+"\n").encode('utf-8'))
+            response = con.recv(1024).decode('utf-8')
+            print(response)
+            if film_list[int(response)]:
+                film_name = film_list[int(response)]
+                con.sendall(("Para se conectar com o cliente envie 'CLI'").encode('utf-8'))
+                if con.recv(1024).decode('utf-8') == 'CLI':
+                    con.sendall(str(film_info[film_name]).encode('utf-8'))
+                break
+            else:
+                con.sendall(("Opção inválida").encode('utf-8'))
+                continue
+        except:
+            print("Erro ao buscar filmes:", sys.exc_info()[0])
 
 def send_movie(con, cliente):
     con.sendall(("Envie a informação do filme seguindo o padrão: \n nome do filme | %/ inicio | %/ fim | host | porta").encode('utf-8'))
@@ -52,22 +52,22 @@ def conectado(con, cliente):
     print ('Conectado por', cliente)
 
     while True:
-    # try:
-        directive = "Envie 1 para consultar os filmes do menu ou 2 para enviar um filme para o menu"
-        con.sendall(directive.encode('utf-8'))
-        response = con.recv(1024).decode('utf-8')
-        print(response)
-        if response == "1":
-            browse_movies(con,cliente)
-            break
-        elif response =="2":
-            send_movie(con,cliente)
-            break
-        else:
-            con.sendall(("Opção invalida").encode('utf-8'))
-            continue
-    # except:
-        # print("Unexpected error:", sys.exc_info()[0])
+        try:
+            directive = "Envie 1 para consultar os filmes do menu ou 2 para enviar um filme para o menu"
+            con.sendall(directive.encode('utf-8'))
+            response = con.recv(1024).decode('utf-8')
+            print(response)
+            if response == "1":
+                browse_movies(con,cliente)
+                break
+            elif response =="2":
+                send_movie(con,cliente)
+                break
+            else:
+                con.sendall(("Opção invalida").encode('utf-8'))
+                continue
+        except:
+            print("Erro com o servidor:", sys.exc_info()[0])
     print ('Finalizando conexao do cliente', cliente)
     con.close()
     _thread.exit()
@@ -82,9 +82,11 @@ def main():
     tcp.listen(1)
 
     while True:
-        con, cliente = tcp.accept()
-        _thread.start_new_thread(conectado, tuple([con, cliente]))
-
+        try:
+            con, cliente = tcp.accept()
+            _thread.start_new_thread(conectado, tuple([con, cliente]))
+        except:
+            print("Erro ao se conectar com cliente: ", sys.exc_info()[0])
     tcp.close()
 
 main()
